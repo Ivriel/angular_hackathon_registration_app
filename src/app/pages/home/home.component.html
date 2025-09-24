@@ -1,5 +1,3 @@
-
-
 <!-- Hero Section -->
 <section class="hero" id="home">
     <div class="container">
@@ -82,33 +80,134 @@
         <div class="section-title">
             <h2>Upcoming Events</h2>
             <p>Join these exciting hackathons and competitions</p>
+            
+            <!-- Events Counter -->
+            <div class="events-counter mb-4">
+                <span class="badge bg-primary">
+                    <i class="fa fa-calendar me-2"></i>
+                    {{ eventList.length }} Total Events
+                </span>
+                @if (totalPages > 1) {
+                    <span class="badge bg-info ms-2">
+                        Page {{ currentPage }} of {{ totalPages }}
+                    </span>
+                }
+            </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="event-card">
-                    <div class="event-header">
-                        <div class="event-date fa-clock"> Dec 15-17, 2025</div>
-                        <h3>AI Innovation Challenge</h3>
-                    </div>
-                    <div class="event-body">
-                        <p>48-hour hackathon focused on artificial intelligence and machine learning solutions.</p>
-                        <span class="event-type">Technology</span>
+
+        <!-- Events Grid -->
+        @if (eventList.length === 0) {
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted">Loading events...</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="event-card">
-                    <div class="event-header">
-                        <div class="event-date fa-clock"> Jan 20-22, 2026</div>
-                        <h3>Green Tech Hackathon</h3>
+        } @else {
+            <div class="row">
+                @if (pagedEvents.length === 0) {
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fa fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No events found</h4>
+                            <p class="text-muted">Check back later for upcoming events!</p>
+                        </div>
                     </div>
-                    <div class="event-body">
-                        <p>Build sustainable solutions for environmental challenges in this eco-focused event.</p>
-                        <span class="event-type">Environment</span>
+                } @else {
+                    @for (event of pagedEvents; track $index) {
+                        <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
+                            <div class="event-card h-100">
+                                <div class="event-header">
+                                    <div class="event-date">
+                                        <i class="fa fa-clock me-2"></i>
+                                        {{ event.startDate | date:'EEEE, dd/MM/yyyy' }} - {{ event.endDate | date:'EEEE, dd/MM/yyyy' }}
+                                    </div>
+                                    <h3>{{ event.title }}</h3>
+                                </div>
+                                <div class="event-body">
+                                    <p>{{ event.description }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="event-type badge" 
+                                              [class.bg-success]="event.status === 'active'"
+                                              [class.bg-warning]="event.status === 'upcoming'"
+                                              [class.bg-secondary]="event.status === 'completed'">
+                                            <i class="fa fa-info-circle me-1"></i>
+                                            {{ event.status | titlecase }}
+                                        </span>
+                                    </div>
+                                    <button [routerLink]="[`/projectsubmit/${event.competitionId}`]" class="btn btn-success w-100" 
+                                            [disabled]="event.status === 'completed'">
+                                        <i class="fa fa-user-plus me-2"></i>
+                                        @if (event.status === 'completed') {
+                                            Event Completed
+                                        } @else {
+                                            Register Now
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+            <div class="row">
+                <div class="col-12">
+                    <nav aria-label="Events pagination" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <!-- Previous Button -->
+                            <li class="page-item" [class.disabled]="currentPage === 1">
+                                <a class="page-link" 
+                                   (click)="goToPreviousPage()" 
+                                   [attr.aria-disabled]="currentPage === 1"
+                                   style="cursor: pointer;">
+                                    <i class="fa fa-chevron-left me-1"></i>
+                                    Previous
+                                </a>
+                            </li>
+
+                            <!-- Page Numbers -->
+                            @for (page of totalPagesArray; track page) {
+                                <li class="page-item" [class.active]="page === currentPage">
+                                    <a class="page-link" 
+                                       (click)="changePage(page)" 
+                                       style="cursor: pointer;"
+                                       [attr.aria-current]="page === currentPage ? 'page' : null">
+                                        {{ page }}
+                                    </a>
+                                </li>
+                            }
+
+                            <!-- Next Button -->
+                            <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                <a class="page-link" 
+                                   (click)="goToNextPage()" 
+                                   [attr.aria-disabled]="currentPage === totalPages"
+                                   style="cursor: pointer;">
+                                    Next
+                                    <i class="fa fa-chevron-right ms-1"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <!-- Pagination Info -->
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Showing {{ (currentPage - 1) * itemsPerPage + 1 }} 
+                            of {{ eventList.length }} events
+                        </small>
                     </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
 </section>
 
@@ -147,4 +246,3 @@
         </div>
     </div>
 </section>
-

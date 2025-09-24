@@ -3,11 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { CompetitionModel } from '../../models/competition';
 import { MasterService } from '../../services/master.service';
 import { CommonModule } from '@angular/common';
-
+import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-events',
   standalone: true, // gunakan standalone biar lebih modular
-  imports: [FormsModule,CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './events.component.html',
   styleUrl: './events.component.css'
 })

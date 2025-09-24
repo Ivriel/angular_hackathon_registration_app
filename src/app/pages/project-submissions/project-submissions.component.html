@@ -1,0 +1,103 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Project Submissions</h4>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col" class="text-center">No</th>
+                  <th scope="col">Project Title</th>
+                  <th scope="col" class="text-center">Status</th>
+                  <th scope="col" class="text-center">Rank</th>
+                  <th scope="col" class="text-center">GitHub</th>
+                  <th scope="col">Full Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col" class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let submission of paginatedData; let index = index">
+                  <td class="text-center fw-bold">{{index+1}}</td>
+                  <td>
+                    <div class="text-truncate" style="max-width: 200px;" [title]="submission.projectTitle">
+                      {{submission.projectTitle}}
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge" 
+                          [ngClass]="{
+                            'bg-success': submission.status === 'Approved',
+                            'bg-warning text-dark': submission.status === 'Pending',
+                            'bg-danger': submission.status === 'Rejected',
+                            'bg-secondary': submission.status === 'Completed'
+                          }">
+                      {{submission.status}}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-info text-dark" *ngIf="submission.rank > 0">
+                      #{{submission.rank}}
+                    </span>
+                    <span class="text-muted" *ngIf="submission.rank === 0">-</span>
+                  </td>
+                  <td class="text-center">
+                    <a *ngIf="submission.githubLink" 
+                       [href]="submission.githubLink" 
+                       target="_blank" 
+                       class="btn btn-outline-dark btn-sm">
+                      <i class="fa fa-github me-1"></i>View
+                    </a>
+                    <span class="text-muted" *ngIf="!submission.githubLink">-</span>
+                  </td>
+                  <td>{{submission.fullName}}</td>
+                  <td>
+                    <div class="text-truncate" style="max-width: 180px;">
+                      <a [href]="'mailto:' + submission.email" 
+                         class="text-decoration-none" 
+                         [title]="submission.email">
+                        {{submission.email}}
+                      </a>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-danger" (click)="onReject(submission.submissionId)">
+                      <i class="fa fa-trash"></i>Reject
+                    </button>
+                    <button class="btn btn-sm btn-success" (click)="onApprove(submission.submissionId)">
+                      <i class="fa fa-pencil"></i>Approve
+                    </button>
+                  </td>
+                </tr>
+                
+                <!-- Empty state -->
+                <tr *ngIf="paginatedData.length === 0">
+                  <td colspan="8" class="text-center text-muted py-4">
+                    <i class="fa fa-inbox fa-2x mb-2"></i>
+                    <div>No project submissions found</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light">
+            <mat-paginator 
+              [length]="totalItems"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="[5, 10, 25, 50]" 
+              [showFirstLastButtons]="true"
+              (page)="onPageChange($event)"
+              class="border-0">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
