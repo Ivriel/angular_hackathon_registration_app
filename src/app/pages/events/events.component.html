@@ -1,0 +1,162 @@
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">🏆 Competition Management</h2>
+        <p class="text-muted">Create and manage your hackathons and coding competitions</p>
+    </div>
+
+    <div class="row">
+        <!-- Kiri: Competition List -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white fw-semibold d-flex align-items-center">
+                    <i class="fa fa-list me-2"></i>
+                    Competitions
+                </div>
+                <div class="card-body">
+                    @if (competitionList.length == 0) {
+                    <div class="text-center py-5 text-muted">
+                        <div class="spinner-border text-primary mb-3"></div>
+                        <p>Loading competitions...</p>
+                    </div>
+                    } @else {
+                    <!-- Grid 3 kolom dalam area col-lg-8 -->
+                    <div class="row g-3">
+                        @for (competition of pagedCompetitions; track $index) {
+                        <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12">
+                            <div class="card border h-100 competition-card">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title fw-bold text-primary mb-2">{{ competition.title }}</h6>
+                                    <p class="card-text small text-muted mb-3">{{ competition.description }}</p>
+                                    
+                                    <div class="mb-2">
+                                        <i class="fa fa-calendar text-muted me-1"></i>
+                                        <small class="text-muted">{{ competition.startDate | date:'dd-MM-yy'}} - {{ competition.endDate | date:'dd-MM-yy'}}</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <i class="fa fa-info-circle text-muted me-1"></i>
+                                        <span class="badge" 
+                                              [class.bg-success]="competition.status === 'active'"
+                                              [class.bg-warning]="competition.status === 'upcoming'"
+                                              [class.bg-secondary]="competition.status === 'completed'">
+                                            Status: {{ competition.status | titlecase }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <button class="btn btn-warning btn-sm flex-fill" >
+                                            <i class="fa fa-pencil me-1"></i>Edit
+                                        </button>
+                                        <button class="btn btn-danger btn-sm flex-fill" >
+                                            <i class="fa fa-trash me-1"></i>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+
+                    <!-- Pagination -->
+                    <nav class="mt-4 d-flex justify-content-center">
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item" [class.disabled]="currentPage === 1">
+                                <a class="page-link" (click)="changePage(currentPage - 1)">Previous</a>
+                            </li>
+                            <li class="page-item" *ngFor="let page of totalPagesArray"
+                                [class.active]="page === currentPage">
+                                <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+                            </li>
+                            <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                <a class="page-link" (click)="changePage(currentPage + 1)">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kanan: Form -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-fit">
+                <div class="card-header bg-success text-white fw-semibold d-flex align-items-center">
+                    <i class="fa fa-plus-circle me-2"></i>
+                    Add / Edit Competition
+                </div>
+                <div class="card-body">
+                    <form (ngSubmit)="onSave()" #competitionForm="ngForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Title</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   [(ngModel)]="competitionObj.title" 
+                                   name="title"
+                                   placeholder="Competition title..."
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Description</label>
+                            <textarea class="form-control" 
+                                      [(ngModel)]="competitionObj.description" 
+                                      name="description"
+                                      rows="4" 
+                                      placeholder="Describe your competition..."
+                                      required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Start Date</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   [(ngModel)]="competitionObj.startDate"
+                                   name="startDate" 
+                                   placeholder="dd-mm-yyyy"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">End Date</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   [(ngModel)]="competitionObj.endDate" 
+                                   name="endDate"
+                                   placeholder="dd-mm-yyyy"
+                                   required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">Select Status</label>
+                            <select class="form-select" 
+                                    [(ngModel)]="competitionObj.status" 
+                                    name="status" 
+                                    required>
+                                <option value="">Select Status</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" 
+                                class="btn btn-primary w-100 fw-medium"
+                                [disabled]="!competitionForm.form.valid">
+                            <i class="fa fa-save me-2"></i>
+                            Save Competition
+                        </button>
+                        
+                        <button type="button" 
+                                class="btn btn-outline-secondary w-100 mt-2"
+                                (click)="onReset()">
+                            <i class="fa fa-refresh me-2"></i>
+                            Reset Form
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
